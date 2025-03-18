@@ -42,11 +42,12 @@ jobs:
       run: |
         make docker-server-debug
         make docker-save
-    - name: Zip the build
-      run: zip -j bombsquad_docker_server_debug.tar.zip build/docker/bombsquad_server_debug_docker.tar
+        mv build/docker/bombsquad_server_debug_docker.tar .
+    # - name: Zip the build
+    #   run: zip -j bombsquad_docker_server_debug.tar.zip build/docker/bombsquad_server_debug_docker.tar
     - name: Upload the build
       uses: ncipollo/release-action@v1
       with:
         body : "See the [Full Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)"
         allowUpdates: true
-        artifacts: bombsquad_docker_server_debug.tar.zip
+        artifacts: bombsquad_docker_server_debug.tar
