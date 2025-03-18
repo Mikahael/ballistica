@@ -50,4 +50,4 @@ jobs:
       with:
         body : "See the [Full Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)"
         allowUpdates: true
-        artifacts: bombsquad_docker_server_debug.tar
+        artifacts: bombsquad_server_debug_docker.tar
