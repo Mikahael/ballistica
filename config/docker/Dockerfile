@@ -44,6 +44,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         python3.12-venv \
         rsync
 
+
 # Copy source code
 COPY ./ /ballistica
 
@@ -78,7 +79,8 @@ ARG cmake_build_type
 LABEL BOMBSQUAD_BUILD_TYPE=${cmake_build_type}
 
 # Install runtime dependencies
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+RUN adduser -D -h /home/container container \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y \
@@ -94,17 +96,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /var/lib/apt/lists/* && \
     python3.12 -c "import uuid; print(uuid.uuid4())" > /etc/machine-id
 
+USER container
+ENV  USER=container HOME=/home/container
+
 # Copy the compiled application from the builder stage
 COPY --from=builder /ballistica_cmake \
-                    /home/ubuntu/ballistica
+                    /home/container
 
 # Set the working directory
-WORKDIR /home/ubuntu/ballistica
+WORKDIR /home/container
 
-RUN ln -s ballisticakit* run
+RUN ln -s ballisticakit* /entrypoint.sh
 
 # Expose the necessary port
 EXPOSE 43210/udp
 
 # Set the default command to run the application
-CMD [ "./run" ]
+CMD [ "/entrypoint.sh" ]
