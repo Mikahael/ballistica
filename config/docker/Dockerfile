@@ -106,7 +106,10 @@ COPY --from=builder /ballistica_cmake \
 # Set the working directory
 WORKDIR /home/container
 
+USER root
 RUN ln -s ballisticakit* /entrypoint.sh
+USER container
+
 
 # Expose the necessary port
 EXPOSE 43210/udp
