@@ -79,7 +79,7 @@ ARG cmake_build_type
 LABEL BOMBSQUAD_BUILD_TYPE=${cmake_build_type}
 
 # Install runtime dependencies
-RUN adduser -D -h /home/container container \
+RUN adduser --disabled-password -h /home/container container \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
