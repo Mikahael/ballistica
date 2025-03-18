@@ -22,5 +22,5 @@ jobs:
             make docker-server-debug
       - name: Push the image
         run: |
-            docker tag bombsquad_server_debug:latest ghcr.io/mikahael/ballistica/bombsquad_server_debug:latest
-            docker push ghcr.io/mikahael/ballistica/bombsquad_server_debug:latest
+            docker tag bombsquad_server_debug:latest ghcr.io/${GITHUB_REPOSITORY,,}/bombsquad_server_debug:latest
+            docker push ghcr.io/${GITHUB_REPOSITORY,,}/bombsquad_server_debug:latest
