@@ -107,7 +107,8 @@ COPY --from=builder /ballistica_cmake \
 WORKDIR /home/container
 
 USER root
-RUN ln -s ballisticakit* /entrypoint.sh
+RUN ln -s ballisticakit* /entrypoint.sh && \
+    chmod +rwx /entrypoint.sh
 USER container
 
 
