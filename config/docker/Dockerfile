@@ -105,11 +105,10 @@ COPY --from=builder /ballistica_cmake \
 
 # Set the working directory
 WORKDIR /home/container
+COPY ./entrypoint.sh /entrypoint.sh
 
 USER root
-RUN ls -l /home/container/ballisticakit* && \
-    ln -s ballisticakit* /entrypoint.sh && \
-    chmod +rwx /entrypoint.sh
+RUN chown -R container ./* && chmod +x /entrypoint.sh
 USER container
 
 
