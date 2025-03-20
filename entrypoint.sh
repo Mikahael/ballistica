@@ -5,4 +5,5 @@ echo ":/home/container$ ${MODIFIED_STARTUP}"
 ${MODIFIED_STARTUP}
 echo okayyyyyyyyy
 ls -al
+ls -al ./path/to/ballisticakit_server
 ./ballisticakit_server
