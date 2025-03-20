@@ -101,7 +101,7 @@ ENV  USER=container HOME=/home/container
 
 # Copy the compiled application from the builder stage
 COPY --from=builder /ballistica_cmake \
-                    /home/ubuntu
+                    /home/me
 
 # Set the working directory
 WORKDIR /home/container
