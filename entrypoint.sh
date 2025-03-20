@@ -6,5 +6,5 @@ ${MODIFIED_STARTUP}
 echo okayyyyyyyyy
 pwd
 ls -al
-ls -al /home/container/ballisticakit_server
+ls -al /home/ubuntu
 ./ballisticakit_server
