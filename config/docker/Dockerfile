@@ -108,7 +108,7 @@ WORKDIR /home/container
 COPY ./entrypoint.sh /entrypoint.sh
 
 USER root
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown -R container:container /home/me
 USER container
 
 
