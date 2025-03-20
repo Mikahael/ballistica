@@ -108,8 +108,7 @@ WORKDIR /home/container
 COPY ./entrypoint.sh /entrypoint.sh
 
 USER root
-RUN cp -R /home/ubuntu /home/container && chown -R container:container ./* && chmod +x /entrypoint.sh && \
-    chmod +x /home/container/ballisticakit_server
+RUN chmod +x /entrypoint.sh
 USER container
 
 
