@@ -105,7 +105,6 @@ COPY --from=builder /ballistica_cmake \
 
 # Set the working directory
 WORKDIR /home/container
-curl -O https://raw.githubusercontent.com/Mikahael/ballistica/refs/heads/main/src/assets/server_package/config.toml
 COPY ./entrypoint.sh /entrypoint.sh
 
 USER root
