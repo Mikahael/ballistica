@@ -1,20 +1,16 @@
 # syntax=docker/dockerfile:1
 
-# if provided it will make debug build
-ARG cmake_build_type=Release
-# whether to make GUI or headless build (defaults to headless)
-ARG headless_build=1
-# system to start with the build with
-# currently will break for other images
+# Define base image
 ARG base_image=ubuntu:latest
 
 #-------------------------------BUILDER--------------------------------
-# Start with the base image
-FROM ${base_image} AS builder
+# Use the base image for building
+FROM ubuntu:latest AS builder
+ARG base_image
 
 # Renew the args
-ARG headless_build
-ARG cmake_build_type
+ARG headless_build=1
+ARG cmake_build_type=Release
 
 # Environment settings
 ENV LANG=en_US.UTF-8
@@ -25,9 +21,7 @@ ENV CMAKE_BUILD_TYPE=${cmake_build_type}
 ENV HEADLESS_BUILD=${headless_build}
 
 # Install build dependencies
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
         clang \
@@ -42,8 +36,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         python3-pip \
         python3.12-dev \
         python3.12-venv \
-        rsync
-
+        rsync && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy source code
 COPY ./ /ballistica
@@ -63,8 +57,9 @@ RUN mkdir /ballistica_cmake && \
     mv build/cmake/*/staged/* /ballistica_cmake
 
 #-------------------------------RUNNER--------------------------------
-# Create a new stage for the runtime environment
-FROM ${base_image} AS runner
+# Use a fresh Ubuntu image for running the compiled application
+FROM ubuntu:latest AS runner
+ARG base_image
 
 # Environment settings
 ENV LANG=en_US.UTF-8
@@ -73,15 +68,13 @@ ENV LC_ALL=en_US.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Renew the args
-ARG headless_build
+ARG headless_build=1
+ARG cmake_build_type=Release
 ENV HEADLESS_BUILD=${headless_build}
-ARG cmake_build_type
 LABEL BOMBSQUAD_BUILD_TYPE=${cmake_build_type}
 
 # Install runtime dependencies
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    useradd -m -s /bin/bash container && \
+RUN useradd -m -s /bin/bash container && \
     apt-get update && \
     apt-get install -y \
         python3.12-dev && \
@@ -96,24 +89,30 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     rm -rf /var/lib/apt/lists/* && \
     python3.12 -c "import uuid; print(uuid.uuid4())" > /etc/machine-id
 
+# Switch to non-root user
 USER container
-ENV  USER=container HOME=/home/container
+ENV USER=container HOME=/home/container
 
 # Copy the compiled application from the builder stage
-COPY --from=builder /ballistica_cmake \
-                    /home/me
+COPY --from=builder /ballistica_cmake /home/me
 
 # Set the working directory
 WORKDIR /home/container
+
+# Copy the entrypoint script
 COPY ./entrypoint.sh /entrypoint.sh
 
+# Download config.toml
+RUN curl -L -o /home/container/config.toml \
+    https://raw.githubusercontent.com/Mikahael/ballistica/refs/heads/main/src/assets/server_package/config.toml
+
+# Give execution permission
 USER root
-RUN chmod +x /entrypoint.sh && chown -R container:container /home/me
+RUN chmod +x /entrypoint.sh && chown -R container:container /home/me /home/container/config.toml
 USER container
 
-
-# Expose the necessary port
+# Expose BombSquad server port
 EXPOSE 43210/udp
 
 # Set the default command to run the application
-CMD [ "/entrypoint.sh" ]
+CMD ["/entrypoint.sh"]
