@@ -7,4 +7,4 @@ ${MODIFIED_STARTUP}
 echo hewllow_worldd
 pwd
 ls -al
-./bombsquad_server
+./ballisticakit_server
